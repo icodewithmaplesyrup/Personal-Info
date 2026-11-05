@@ -3,7 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Personal stat sheet: an everyday profile matrix.">
+    <meta name="description" content="Build a structured profile stat card, share it with one link, and find people who share your interests.">
+    <meta name="theme-color" content="#0f172a">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Personal Stat Sheet">
+    <meta property="og:title" content="Personal Stat Sheet">
+    <meta property="og:description" content="Build a structured profile stat card, share it with one link, and find people who share your interests.">
+    <meta property="og:url" content="https://icodewithmaplesyrup.github.io/Personal-Info/">
+    <meta property="og:image" content="https://icodewithmaplesyrup.github.io/Personal-Info/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
     <title>Personal Stat Sheet - Minimal Everyday Profile Matrix</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -1298,19 +1308,20 @@
             if(e.target.files[0]) reader.readAsText(e.target.files[0]);
         }
     </script>
-   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.1/dist/umd/supabase.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.1/dist/umd/supabase.min.js"></script>
+    <script>window.supabase || document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"><\/script>')</script>
     <script>
     /* =====================================================================
        SUPABASE BACKEND: accounts, saving, profile URLs, Discover.
        Everything lives in this block. Edit index.html only.
        ===================================================================== */
     const SUPABASE_URL = 'https://knkzytbnkknuthxuxnya.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_3o1lwZ0TnH4LPSPCKcxo0A_3QJLSByi';   // public by design; row-level security protects data
+    const SUPABASE_ANON_KEY = 'YOUR-PUBLISHABLE-KEY';   // paste your sb_publishable_... key. Public by design; NEVER use an sb_secret_ key here
 
     (function () {
         'use strict';
-        if (SUPABASE_URL.includes('YOUR-PROJECT')) {
-            document.body.insertAdjacentHTML('afterbegin', '<div class="max-w-6xl mx-auto mb-3 text-xs rounded px-3 py-2 bg-amber-100 text-amber-900">Local-only mode: set SUPABASE_URL and SUPABASE_ANON_KEY near the bottom of index.html to enable accounts and Discover.</div>');
+        if (SUPABASE_URL.includes('YOUR-') || SUPABASE_ANON_KEY.includes('YOUR-')) {
+            document.body.insertAdjacentHTML('afterbegin', '<div class="max-w-6xl mx-auto mb-3 text-xs rounded px-3 py-2 bg-amber-100 text-amber-900">Local-only mode: set SUPABASE_URL and SUPABASE_ANON_KEY (your sb_publishable_ key) near the bottom of index.html to enable accounts and Discover.</div>');
             return;
         }
 
