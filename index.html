@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Personal stat sheet: an everyday profile matrix.">
+    <title>Personal Stat Sheet - Minimal Everyday Profile Matrix</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .theme-slate {
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --border-hover: #cbd5e1;
+            --accent: #334155;
+            --accent-bg: #f1f5f9;
+            --tag-bg: #f1f5f9;
+            --tag-text: #334155;
+        }
+
+        .theme-mono {
+            --bg: #f5f5f5;
+            --card-bg: #ffffff;
+            --text-main: #171717;
+            --text-muted: #737373;
+            --border: #e5e5e5;
+            --border-hover: #d4d4d4;
+            --accent: #171717;
+            --accent-bg: #f5f5f5;
+            --tag-bg: #e5e5e5;
+            --tag-text: #171717;
+        }
+
+        .theme-paper {
+            --bg: #fbf9f5;
+            --card-bg: #ffffff;
+            --text-main: #27272a;
+            --text-muted: #71717a;
+            --border: #e4e4e7;
+            --border-hover: #d4d4d8;
+            --accent: #78350f;
+            --accent-bg: #fef3c7;
+            --tag-bg: #fef3c7;
+            --tag-text: #92400e;
+        }
+
+        .theme-sage {
+            --bg: #f4f7f5;
+            --card-bg: #ffffff;
+            --text-main: #1c2e24;
+            --text-muted: #577063;
+            --border: #dbe4de;
+            --border-hover: #c4d3c9;
+            --accent: #2d4a3e;
+            --accent-bg: #eaf1ed;
+            --tag-bg: #eaf1ed;
+            --tag-text: #2d4a3e;
+        }
+
+        .theme-dark {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --border-hover: #475569;
+            --accent: #38bdf8;
+            --accent-bg: #0c4a6e;
+            --tag-bg: #334155;
+            --tag-text: #f8fafc;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+        }
+
+        .card-frame {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+        }
+
+        .border-theme {
+            border-color: var(--border);
+        }
+
+        .tag-pill {
+            background-color: var(--tag-bg);
+            color: var(--tag-text);
+        }
+
+        /* Custom subtle scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(150, 150, 150, 0.3); border-radius: 3px; }
+    </style>
+</head>
+<body class="theme-slate font-sans antialiased min-h-screen p-3 sm:p-6 transition-colors duration-200">
+
+    <!-- Header Navigation -->
+    <header class="max-w-6xl mx-auto mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-theme pb-4">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded bg-slate-900 text-white flex items-center justify-center font-mono font-bold text-sm">
+                S/S
+            </div>
+            <div>
+                <h1 class="font-semibold text-base tracking-tight leading-none">PERSONAL STAT SHEET</h1>
+                <p class="text-xs text-slate-500 font-mono mt-0.5">Exhaustive everyday trait matrix</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 text-xs flex-wrap">
+            <!-- Quick Fill / Clear Buttons -->
+            <button onclick="clearAllFields()" class="px-2.5 py-1.5 rounded card-frame hover:bg-red-50 text-red-600 dark:hover:bg-red-950 font-medium transition-colors">
+                <i class="fa-solid fa-trash-can mr-1"></i> Clear All
+            </button>
+            <button onclick="fillSampleData()" class="px-2.5 py-1.5 rounded card-frame hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition-colors">
+                <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Sample Demo
+            </button>
+
+            <!-- Theme Picker -->
+            <select id="themeSelect" onchange="changeTheme(this.value)" class="card-frame rounded px-2 py-1.5 text-xs font-medium focus:outline-none cursor-pointer">
+                <option value="slate">Soft Slate</option>
+                <option value="mono">Clean Mono</option>
+                <option value="paper">Warm Paper</option>
+                <option value="sage">Sage Botanical</option>
+                <option value="dark">Slate Dark</option>
+            </select>
+
+            <button onclick="toggleEditMode()" id="editToggleBtn" class="px-3 py-1.5 rounded border border-theme hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition-colors flex items-center gap-1.5">
+                <i class="fa-solid fa-pen text-slate-400"></i>
+                <span id="editToggleText">Close Editor</span>
+            </button>
+
+            <button onclick="openShareModal()" class="px-3 py-1.5 rounded bg-slate-900 text-white font-medium hover:bg-slate-800 transition-colors flex items-center gap-1.5">
+                <i class="fa-solid fa-share-nodes text-xs"></i>
+                <span>Share Link</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Workspace -->
+    <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- EDITOR PANEL -->
+        <aside id="editorPanel" class="lg:col-span-5 space-y-4">
+            <div class="card-frame rounded-lg p-4 space-y-4 shadow-sm">
+                <div class="flex items-center justify-between border-b border-theme pb-3">
+                    <h2 class="font-semibold text-sm tracking-tight flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-xs text-slate-400"></i> STAT SHEET EDITOR
+                    </h2>
+                    <span class="text-[11px] font-mono text-slate-400">Auto-collapses empty fields</span>
+                </div>
+
+                <!-- Category Sub-tabs -->
+                <div class="flex flex-wrap gap-1 border-b border-theme pb-2 text-[11px] font-medium">
+                    <button onclick="switchTab('basic')" id="tab-basic" class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-800">Identity</button>
+                    <button onclick="switchTab('physical')" id="tab-physical" class="px-2 py-1 rounded text-slate-500 hover:text-slate-900">Physical</button>
+                    <button onclick="switchTab('languages')" id="tab-languages" class="px-2 py-1 rounded text-slate-500 hover:text-slate-900">Languages</button>
+                    <button onclick="switchTab('hobbies')" id="tab-hobbies" class="px-2 py-1 rounded text-slate-500 hover:text-slate-900">Hobbies</button>
+                    <button onclick="switchTab('rhythms')" id="tab-rhythms" class="px-2 py-1 rounded text-slate-500 hover:text-slate-900">Rhythms</button>
+                    <button onclick="switchTab('social')" id="tab-social" class="px-2 py-1 rounded text-slate-500 hover:text-slate-900">Comm & Social</button>
+                    <button onclick="switchTab('dietary')" id="tab-dietary" class="px-2 py-1 rounded text-slate-500 hover:text-slate-900">Diet & Sensory</button>
+                    <button onclick="switchTab('workgear')" id="tab-workgear" class="px-2 py-1 rounded text-slate-500 hover:text-slate-900">Work & Gear</button>
+                    <button onclick="switchTab('values')" id="tab-values" class="px-2 py-1 rounded text-slate-500 hover:text-slate-900">Values & Vibe</button>
+                    <button onclick="switchTab('custom')" id="tab-custom" class="px-2 py-1 rounded text-slate-500 hover:text-slate-900">Custom</button>
+                </div>
+
+                <!-- FORM SECTIONS -->
+                
+                <!-- 1. IDENTITY & BASICS -->
+                <div id="section-basic" class="form-sec space-y-3 text-xs">
+                    <div>
+                        <label class="block font-medium mb-1">Full Name</label>
+                        <input type="text" id="in-name" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Alex Rivera">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-medium mb-1">Preferred Handle / Moniker</label>
+                            <input type="text" id="in-handle" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. @arivera">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Pronouns</label>
+                            <input type="text" id="in-pronouns" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. They/Them, She/Her">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-medium mb-1">Location & Timezone</label>
+                            <input type="text" id="in-location" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Chicago, IL (UTC-5)">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Age Range / Birthday</label>
+                            <input type="text" id="in-age" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Late 20s / Nov 14">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-1">Primary Contact Channel</label>
+                        <input type="text" id="in-contact" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Signal / Discord / Email">
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-1">Short Bio / Motto</label>
+                        <input type="text" id="in-motto" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Optimize for momentum and clarity.">
+                    </div>
+                </div>
+
+                <!-- 2. PHYSICAL & BIOLOGICAL TRAITS -->
+                <div id="section-physical" class="form-sec hidden space-y-3 text-xs">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-medium mb-1">Height</label>
+                            <input type="text" id="in-height" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. 5'10&quot; (178 cm)">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Build / Frame</label>
+                            <input type="text" id="in-build" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Athletic, Stocky, Slim">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-medium mb-1">Hair Color & Style</label>
+                            <input type="text" id="in-hair" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Dark brown, short crop">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Eye Color</label>
+                            <input type="text" id="in-eyes" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Hazel / Brown">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-medium mb-1">Dominant Hand</label>
+                            <input type="text" id="in-hand" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Right-handed, Ambidextrous">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Eyesight / Eyewear</label>
+                            <input type="text" id="in-eyesight" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Glasses for reading, 20/20">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-medium mb-1">Tattoos / Piercings</label>
+                            <input type="text" id="in-tattoos" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. 3 sleeve tattoos, septum piercing">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Weather Sensitivities</label>
+                            <input type="text" id="in-weather" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Thrives in cold, dislikes humidity">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-1">Physical Quirks / Notes</label>
+                        <input type="text" id="in-physicalQuirks" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Double jointed thumb, constant leg fidgeting">
+                    </div>
+                </div>
+
+                <!-- 3. LANGUAGES & PROFICIENCY -->
+                <div id="section-languages" class="form-sec hidden space-y-3 text-xs">
+                    <div class="flex items-center justify-between">
+                        <label class="font-medium">Languages & Proficiency</label>
+                        <button onclick="addLanguage()" class="text-xs px-2 py-0.5 rounded bg-slate-900 text-white font-medium">+ Add Language</button>
+                    </div>
+                    <div id="langInputsContainer" class="space-y-2">
+                        <!-- Dynamic language inputs -->
+                    </div>
+                </div>
+
+                <!-- 4. CATEGORIZED HOBBIES & FIXATIONS -->
+                <div id="section-hobbies" class="form-sec hidden space-y-3 text-xs">
+                    <p class="text-[11px] text-slate-500">Comma-separated lists per hobby category.</p>
+                    
+                    <div>
+                        <label class="block font-medium mb-1"><i class="fa-solid fa-person-running text-slate-400 mr-1"></i> Athletic & Physical Hobbies</label>
+                        <input type="text" id="in-hobby-athletic" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Trail running, Bouldering, Swimming">
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-1"><i class="fa-solid fa-palette text-slate-400 mr-1"></i> Creative & Expressive Hobbies</label>
+                        <input type="text" id="in-hobby-creative" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Sketching, Analog synth composition, Writing">
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-1"><i class="fa-solid fa-book-open text-slate-400 mr-1"></i> Intellectual & Curiosity Fixations</label>
+                        <input type="text" id="in-hobby-intellectual" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Urban history, Astrophysics, Mechanical keyboards">
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-1"><i class="fa-solid fa-users text-slate-400 mr-1"></i> Social & Group Hobbies</label>
+                        <input type="text" id="in-hobby-social" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. D&D campaigns, Board game nights, Group dinners">
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-1"><i class="fa-solid fa-gamepad text-slate-400 mr-1"></i> Gaming & Digital Hobbies</label>
+                        <input type="text" id="in-hobby-gaming" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Factory sims, Tactical RPGs, Emulators">
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-1"><i class="fa-solid fa-campground text-slate-400 mr-1"></i> Outdoor & Nature Hobbies</label>
+                        <input type="text" id="in-hobby-outdoor" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Multi-day trekking, Mushroom foraging, Gardening">
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-1"><i class="fa-solid fa-wrench text-slate-400 mr-1"></i> Crafts & Hands-On Hobbies</label>
+                        <input type="text" id="in-hobby-crafts" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Soldering microcontrollers, Leatherworking">
+                    </div>
+                </div>
+
+                <!-- 5. DAILY RHYTHMS & ENERGY PROFILE -->
+                <div id="section-rhythms" class="form-sec hidden space-y-3 text-xs">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-medium mb-1">Chronotype</label>
+                            <input type="text" id="in-chronotype" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Early Bird (05:30 - 21:30)">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Peak Productivity Hours</label>
+                            <input type="text" id="in-peakHours" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. 07:00 AM - 11:00 AM">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-medium mb-1">Daily Sleep Need</label>
+                            <input type="text" id="in-sleepNeed" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. 7.5 to 8 Hours minimum">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Caffeine / Coffee Intake</label>
+                            <input type="text" id="in-caffeine" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. 2 Espresso shots before noon">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-medium mb-1">Work Noise Sensitivity</label>
+                            <input type="text" id="in-noisePref" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Total silence / White noise ANC">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Ideal Temperature</label>
+                            <input type="text" id="in-tempPref" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Cool 67°F (19°C)">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-1">Daily Energy Pattern</label>
+                        <input type="text" id="in-energyPattern" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. High morning energy, post-lunch dip, steady evening focus">
+                    </div>
+                </div>
+
+                <!-- 6. COMMUNICATION & SOCIAL DYNAMICS -->
+                <div id="section-social" class="form-sec hidden space-y-3 text-xs">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-medium mb-1">Preferred Apps</label>
+                            <input type="text" id="in-messagingApps" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Signal > Discord > Email">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Response Pace</label>
+                            <input type="text" id="in-responsePace" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Batch responder (1-2x daily)">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-medium mb-1">Small Talk Preference</label>
+                            <input type="text" id="in-smallTalkStance" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Prefer jumping directly into topics">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Directness Level</label>
+                            <input type="text" id="in-directness" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. High directness, tactful delivery">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-medium mb-1">Social Battery Capacity</label>
+                            <input type="text" id="in-socialBattery" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Moderate (2-3 hrs max in groups)">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Group Size Preference</label>
+                            <input type="text" id="in-groupPref" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. 1-on-1 or small groups of 3-4">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-1">Voice / Video Calls Stance</label>
+                        <input type="text" id="in-callStance" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Async text preferred; audio calls scheduled ahead">
+                    </div>
+                </div>
+
+                <!-- 7. DIETARY & SENSORY PREFERENCES -->
+                <div id="section-dietary" class="form-sec hidden space-y-3 text-xs">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-medium mb-1">Dietary Pattern</label>
+                            <input type="text" id="in-dietPattern" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Vegetarian, Gluten-Free option">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Spice Tolerance</label>
+                            <input type="text" id="in-spiceTolerance" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. High (Habanero / Thai hot)">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-1">Favorite Flavor Profiles</label>
+                        <input type="text" id="in-flavorProfiles" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Savory, Umami, Fermented, Citrus">
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-1">Sensory Sensitivities / Triggers</label>
+                        <input type="text" id="in-sensoryNotes" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Fluorescent lights, Overcrowded venues">
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-1">Comfort Foods & Drinks</label>
+                        <input type="text" id="in-comfortFoods" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Ramen, Matcha latte, Sourdough bread">
+                    </div>
+                </div>
+
+                <!-- 8. WORK, TOOLS & EVERYDAY GEAR STACK -->
+                <div id="section-workgear" class="form-sec hidden space-y-3 text-xs">
+                    <div>
+                        <label class="block font-medium mb-1">Current Role / Primary Focus</label>
+                        <input type="text" id="in-workRole" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Systems Engineer & Researcher">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-medium mb-1">Work Style</label>
+                            <input type="text" id="in-workStyle" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Async solo deep work blocks">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Primary OS / Environment</label>
+                            <input type="text" id="in-primaryOS" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Linux / macOS terminal">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-1">Daily Carry Gear (EDC)</label>
+                        <input type="text" id="in-edcGear" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Ricoh GR III, Pocket notebook, Multi-tool">
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-1">Favorite Tools & Software</label>
+                        <input type="text" id="in-softwareTools" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Obsidian, Neovim, Figma, Anki">
+                    </div>
+                </div>
+
+                <!-- 9. PERSONAL VALUES, VIBE & PET PEEVES -->
+                <div id="section-values" class="form-sec hidden space-y-3 text-xs">
+                    <div>
+                        <label class="block font-medium mb-1">Top Life Values / Priorities</label>
+                        <input type="text" id="in-topValues" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Autonomy, Curiosity, Craftsmanship, Honesty">
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-1">Topics You Can Discuss for Hours</label>
+                        <input type="text" id="in-favoriteTopics" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Transit systems, Game design, Audio engineering">
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-1">Current Hyperfixation / Media</label>
+                        <input type="text" id="in-hyperfixation" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. 1970s Japanese Architecture docs">
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-1">Pet Peeves & Dealbreakers</label>
+                        <input type="text" id="in-petPeeves" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Loud phone speakers in public, Chronic tardiness">
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-1">Favorite Aesthetics / Vibes</label>
+                        <input type="text" id="in-aesthetics" oninput="updateData()" class="w-full card-frame rounded px-2.5 py-1.5 focus:outline-none" placeholder="e.g. Brutalist architecture, Warm wood & brass, Brutalist code">
+                    </div>
+                </div>
+
+                <!-- 10. CUSTOM CATEGORY BUILDER -->
+                <div id="section-custom" class="form-sec hidden space-y-3 text-xs">
+                    <div class="flex items-center justify-between">
+                        <label class="font-medium">Custom Trait Categories</label>
+                        <button onclick="addCustomCategory()" class="text-xs px-2 py-0.5 rounded bg-slate-900 text-white font-medium">+ Add Custom Section</button>
+                    </div>
+                    <div id="customSectionsContainer" class="space-y-3">
+                        <!-- Dynamic Custom Sections -->
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- PUBLIC DISPLAY STAT SHEET PANEL -->
+        <section id="previewPanel" class="lg:col-span-7 space-y-4">
+            
+            <div id="profileCard" class="card-frame rounded-xl p-5 sm:p-7 shadow-sm space-y-6">
+                
+                <!-- TOP HEADER: IDENTITY BLOCK -->
+                <div class="border-b border-theme pb-5 flex flex-wrap items-start justify-between gap-4">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-3 flex-wrap">
+                            <h1 id="out-name" class="text-2xl sm:text-3xl font-bold tracking-tight">YOUR NAME</h1>
+                            <span id="out-handle" class="text-xs px-2 py-0.5 rounded font-mono text-slate-500 card-frame"></span>
+                            <span id="out-pronouns" class="text-xs px-2.5 py-0.5 rounded font-mono font-medium tag-pill"></span>
+                        </div>
+                        <p id="out-motto" class="text-sm font-medium text-slate-500"></p>
+                    </div>
+
+                    <div class="text-left sm:text-right space-y-1 text-xs font-mono">
+                        <div id="out-location" class="flex items-center sm:justify-end gap-1.5 text-slate-600 dark:text-slate-400">
+                            <i class="fa-solid fa-location-dot text-[11px]"></i>
+                            <span></span>
+                        </div>
+                        <div id="out-age" class="text-slate-500"></div>
+                        <div id="out-contact" class="text-slate-500"></div>
+                    </div>
+                </div>
+
+                <!-- 1. PHYSICAL & BIOLOGICAL TRAITS CARD -->
+                <div id="box-physical" class="card-frame rounded-lg p-4 space-y-3">
+                    <div class="flex items-center gap-2 border-b border-theme pb-2 text-xs font-semibold tracking-wider text-slate-400 uppercase font-mono">
+                        <i class="fa-solid fa-user text-sm"></i>
+                        <span>Physical & Biological Traits</span>
+                    </div>
+                    <div id="out-physical-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- 2. LANGUAGES CARD -->
+                <div id="box-languages" class="card-frame rounded-lg p-4 space-y-3">
+                    <div class="flex items-center gap-2 border-b border-theme pb-2 text-xs font-semibold tracking-wider text-slate-400 uppercase font-mono">
+                        <i class="fa-solid fa-language text-sm"></i>
+                        <span>Languages & Proficiency</span>
+                    </div>
+                    <div id="out-languages" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- 3. CATEGORIZED HOBBIES & INTERESTS CARD -->
+                <div id="box-hobbies" class="card-frame rounded-lg p-4 space-y-3">
+                    <div class="flex items-center gap-2 border-b border-theme pb-2 text-xs font-semibold tracking-wider text-slate-400 uppercase font-mono">
+                        <i class="fa-solid fa-icons text-sm"></i>
+                        <span>Categorized Hobbies & Fixations</span>
+                    </div>
+                    <div id="out-hobbies-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- 4. DAILY RHYTHMS & ENERGY CARD -->
+                <div id="box-rhythms" class="card-frame rounded-lg p-4 space-y-3">
+                    <div class="flex items-center gap-2 border-b border-theme pb-2 text-xs font-semibold tracking-wider text-slate-400 uppercase font-mono">
+                        <i class="fa-solid fa-clock text-sm"></i>
+                        <span>Daily Rhythms & Energy Profile</span>
+                    </div>
+                    <div id="out-rhythms-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- 5. SOCIAL & COMMUNICATION DYNAMICS CARD -->
+                <div id="box-social" class="card-frame rounded-lg p-4 space-y-3">
+                    <div class="flex items-center gap-2 border-b border-theme pb-2 text-xs font-semibold tracking-wider text-slate-400 uppercase font-mono">
+                        <i class="fa-solid fa-comments text-sm"></i>
+                        <span>Communication & Social Dynamics</span>
+                    </div>
+                    <div id="out-social-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- 6. DIETARY & SENSORY PREFERENCES CARD -->
+                <div id="box-dietary" class="card-frame rounded-lg p-4 space-y-3">
+                    <div class="flex items-center gap-2 border-b border-theme pb-2 text-xs font-semibold tracking-wider text-slate-400 uppercase font-mono">
+                        <i class="fa-solid fa-utensils text-sm"></i>
+                        <span>Dietary & Sensory Preferences</span>
+                    </div>
+                    <div id="out-dietary-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- 7. WORK & GEAR STACK CARD -->
+                <div id="box-workgear" class="card-frame rounded-lg p-4 space-y-3">
+                    <div class="flex items-center gap-2 border-b border-theme pb-2 text-xs font-semibold tracking-wider text-slate-400 uppercase font-mono">
+                        <i class="fa-solid fa-laptop-code text-sm"></i>
+                        <span>Work, Tools & Daily Gear</span>
+                    </div>
+                    <div id="out-workgear-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- 8. PERSONAL VALUES & VIBE CARD -->
+                <div id="box-values" class="card-frame rounded-lg p-4 space-y-3">
+                    <div class="flex items-center gap-2 border-b border-theme pb-2 text-xs font-semibold tracking-wider text-slate-400 uppercase font-mono">
+                        <i class="fa-solid fa-compass text-sm"></i>
+                        <span>Personal Values, Vibe & Topics</span>
+                    </div>
+                    <div id="out-values-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- DYNAMIC CUSTOM SECTIONS CONTAINER -->
+                <div id="out-custom-sections" class="space-y-4">
+                    <!-- Added by user dynamically -->
+                </div>
+
+                <!-- FOOTER -->
+                <div class="pt-4 border-t border-theme flex flex-wrap items-center justify-between text-xs text-slate-400 font-mono gap-2">
+                    <span>STRUCTURED HUMAN STAT CARD</span>
+                    <span>AUTOMATICALLY COLLAPSED PREVIEW</span>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Share Link / Export Modal -->
+    <div id="shareModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="card-frame max-w-md w-full rounded-xl p-5 space-y-4 shadow-xl">
+            <div class="flex justify-between items-center border-b border-theme pb-3">
+                <h3 class="font-semibold text-sm">Share Profile / Manage Data</h3>
+                <button onclick="closeShareModal()" class="text-slate-400 hover:text-slate-600 text-sm"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="space-y-2 text-xs">
+                <label class="font-medium text-slate-600 dark:text-slate-300 block">Shareable Profile Link</label>
+                <div class="flex gap-2">
+                    <input type="text" id="shareUrl" readonly class="card-frame flex-1 rounded px-2.5 py-1.5 font-mono text-xs focus:outline-none">
+                    <button onclick="copyLink()" class="px-3 py-1.5 bg-slate-900 text-white rounded font-medium hover:bg-slate-800 transition-colors">Copy</button>
+                </div>
+                <p id="copyMsg" class="text-[11px] text-emerald-600 font-medium hidden">Link copied to clipboard!</p>
+            </div>
+
+            <div class="border-t border-theme pt-3 space-y-2 text-xs">
+                <label class="font-medium text-slate-600 dark:text-slate-300 block">Backup / Restore (JSON)</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="exportJSON()" class="card-frame py-2 rounded font-medium hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Export JSON</button>
+                    <label class="card-frame py-2 rounded font-medium text-center hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer block transition-colors">
+                        Import JSON
+                        <input type="file" onchange="importJSON(event)" accept=".json" class="hidden">
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript State & Logic -->
+    <script>
+        // Default Exhaustive Blank Profile Architecture
+        function createBlankProfile() {
+            return {
+                theme: 'slate',
+                // Identity
+                name: '',
+                handle: '',
+                pronouns: '',
+                location: '',
+                age: '',
+                contact: '',
+                motto: '',
+                
+                // Physical Traits
+                height: '',
+                build: '',
+                hair: '',
+                eyes: '',
+                hand: '',
+                eyesight: '',
+                tattoos: '',
+                weather: '',
+                physicalQuirks: '',
+
+                // Languages
+                languages: [],
+
+                // Hobbies & Fixations
+                hobbies: {
+                    athletic: [],
+                    creative: [],
+                    intellectual: [],
+                    social: [],
+                    gaming: [],
+                    outdoor: [],
+                    crafts: []
+                },
+
+                // Rhythms & Energy
+                chronotype: '',
+                peakHours: '',
+                sleepNeed: '',
+                caffeine: '',
+                noisePref: '',
+                tempPref: '',
+                energyPattern: '',
+
+                // Communication & Social
+                messagingApps: '',
+                responsePace: '',
+                smallTalkStance: '',
+                directness: '',
+                socialBattery: '',
+                groupPref: '',
+                callStance: '',
+
+                // Dietary & Sensory
+                dietPattern: '',
+                spiceTolerance: '',
+                flavorProfiles: '',
+                sensoryNotes: '',
+                comfortFoods: '',
+
+                // Work & Gear
+                workRole: '',
+                workStyle: '',
+                primaryOS: '',
+                edcGear: '',
+                softwareTools: '',
+
+                // Values & Vibe
+                topValues: '',
+                favoriteTopics: '',
+                hyperfixation: '',
+                petPeeves: '',
+                aesthetics: '',
+
+                // Custom Sections
+                customSections: []
+            };
+        }
+
+        let profile = createBlankProfile();
+
+        window.onload = function() {
+            loadState();
+            populateForms();
+            renderProfile();
+        };
+
+        function populateForms() {
+            const keys = [
+                'name', 'handle', 'pronouns', 'location', 'age', 'contact', 'motto',
+                'height', 'build', 'hair', 'eyes', 'hand', 'eyesight', 'tattoos', 'weather', 'physicalQuirks',
+                'chronotype', 'peakHours', 'sleepNeed', 'caffeine', 'noisePref', 'tempPref', 'energyPattern',
+                'messagingApps', 'responsePace', 'smallTalkStance', 'directness', 'socialBattery', 'groupPref', 'callStance',
+                'dietPattern', 'spiceTolerance', 'flavorProfiles', 'sensoryNotes', 'comfortFoods',
+                'workRole', 'workStyle', 'primaryOS', 'edcGear', 'softwareTools',
+                'topValues', 'favoriteTopics', 'hyperfixation', 'petPeeves', 'aesthetics'
+            ];
+
+            keys.forEach(k => {
+                const el = document.getElementById(`in-${k}`);
+                if (el) el.value = profile[k] || '';
+            });
+
+            // Hobbies
+            const hTypes = ['athletic', 'creative', 'intellectual', 'social', 'gaming', 'outdoor', 'crafts'];
+            hTypes.forEach(t => {
+                const el = document.getElementById(`in-hobby-${t}`);
+                if (el) el.value = (profile.hobbies && profile.hobbies[t]) ? profile.hobbies[t].join(', ') : '';
+            });
+
+            document.getElementById('themeSelect').value = profile.theme || 'slate';
+            changeTheme(profile.theme || 'slate');
+
+            renderLanguageInputs();
+            renderCustomSectionInputs();
+        }
+
+        function updateData() {
+            const keys = [
+                'name', 'handle', 'pronouns', 'location', 'age', 'contact', 'motto',
+                'height', 'build', 'hair', 'eyes', 'hand', 'eyesight', 'tattoos', 'weather', 'physicalQuirks',
+                'chronotype', 'peakHours', 'sleepNeed', 'caffeine', 'noisePref', 'tempPref', 'energyPattern',
+                'messagingApps', 'responsePace', 'smallTalkStance', 'directness', 'socialBattery', 'groupPref', 'callStance',
+                'dietPattern', 'spiceTolerance', 'flavorProfiles', 'sensoryNotes', 'comfortFoods',
+                'workRole', 'workStyle', 'primaryOS', 'edcGear', 'softwareTools',
+                'topValues', 'favoriteTopics', 'hyperfixation', 'petPeeves', 'aesthetics'
+            ];
+
+            keys.forEach(k => {
+                const el = document.getElementById(`in-${k}`);
+                if (el) profile[k] = el.value.trim();
+            });
+
+            // Hobbies
+            if (!profile.hobbies) profile.hobbies = {};
+            const hTypes = ['athletic', 'creative', 'intellectual', 'social', 'gaming', 'outdoor', 'crafts'];
+            hTypes.forEach(t => {
+                const el = document.getElementById(`in-hobby-${t}`);
+                if (el) profile.hobbies[t] = parseTags(el.value);
+            });
+
+            saveState();
+            renderProfile();
+        }
+
+        function parseTags(str) {
+            if (!str) return [];
+            return str.split(',').map(s => s.trim()).filter(Boolean);
+        }
+
+        // Languages List Form Manager
+        function renderLanguageInputs() {
+            const container = document.getElementById('langInputsContainer');
+            if(!container) return;
+            container.innerHTML = '';
+            (profile.languages || []).forEach((lang, idx) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center gap-1.5';
+                div.innerHTML = `
+                    <input type="text" value="${lang.name || ''}" placeholder="Language" oninput="updateLanguage(${idx}, 'name', this.value)" class="w-1/2 card-frame rounded px-2 py-1">
+                    <input type="text" value="${lang.level || ''}" placeholder="Level (e.g. Native / Fluent)" oninput="updateLanguage(${idx}, 'level', this.value)" class="w-1/2 card-frame rounded px-2 py-1">
+                    <button onclick="removeLanguage(${idx})" class="text-slate-400 hover:text-red-500 px-1 font-bold">×</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function addLanguage() {
+            if (!profile.languages) profile.languages = [];
+            profile.languages.push({ name: '', level: '' });
+            renderLanguageInputs();
+            updateData();
+        }
+
+        function updateLanguage(idx, field, value) {
+            profile.languages[idx][field] = value;
+            updateData();
+        }
+
+        function removeLanguage(idx) {
+            profile.languages.splice(idx, 1);
+            renderLanguageInputs();
+            updateData();
+        }
+
+        // Custom Sections Form Inputs
+        function renderCustomSectionInputs() {
+            const container = document.getElementById('customSectionsContainer');
+            if(!container) return;
+            container.innerHTML = '';
+            (profile.customSections || []).forEach((sec, sIdx) => {
+                const box = document.createElement('div');
+                box.className = 'card-frame rounded p-2.5 space-y-2';
+                
+                let itemsHtml = '';
+                (sec.items || []).forEach((item, iIdx) => {
+                    itemsHtml += `
+                        <div class="flex items-center gap-1.5">
+                            <input type="text" value="${item.label || ''}" placeholder="Label" oninput="updateCustomItem(${sIdx}, ${iIdx}, 'label', this.value)" class="w-1/3 card-frame rounded px-2 py-1 font-mono text-[11px]">
+                            <input type="text" value="${item.val || ''}" placeholder="Value" oninput="updateCustomItem(${sIdx}, ${iIdx}, 'val', this.value)" class="w-2/3 card-frame rounded px-2 py-1">
+                            <button onclick="removeCustomItem(${sIdx}, ${iIdx})" class="text-slate-400 hover:text-red-500 px-1">×</button>
+                        </div>
+                    `;
+                });
+
+                box.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <input type="text" value="${sec.title || ''}" placeholder="Category Title" oninput="updateCustomTitle(${sIdx}, this.value)" class="font-semibold card-frame rounded px-2 py-1 text-xs w-2/3">
+                        <button onclick="removeCustomSection(${sIdx})" class="text-xs text-red-500 hover:underline">Remove Section</button>
+                    </div>
+                    <div class="space-y-1.5">${itemsHtml}</div>
+                    <button onclick="addCustomItem(${sIdx})" class="text-[11px] text-slate-500 font-medium hover:underline">+ Add Stat</button>
+                `;
+                container.appendChild(box);
+            });
+        }
+
+        function addCustomCategory() {
+            if(!profile.customSections) profile.customSections = [];
+            profile.customSections.push({ title: 'New Custom Category', items: [{ label: '', val: '' }] });
+            renderCustomSectionInputs();
+            updateData();
+        }
+
+        function updateCustomTitle(sIdx, title) {
+            profile.customSections[sIdx].title = title;
+            updateData();
+        }
+
+        function updateCustomItem(sIdx, iIdx, field, val) {
+            profile.customSections[sIdx].items[iIdx][field] = val;
+            updateData();
+        }
+
+        function addCustomItem(sIdx) {
+            profile.customSections[sIdx].items.push({ label: '', val: '' });
+            renderCustomSectionInputs();
+            updateData();
+        }
+
+        function removeCustomItem(sIdx, iIdx) {
+            profile.customSections[sIdx].items.splice(iIdx, 1);
+            renderCustomSectionInputs();
+            updateData();
+        }
+
+        function removeCustomSection(sIdx) {
+            profile.customSections.splice(sIdx, 1);
+            renderCustomSectionInputs();
+            updateData();
+        }
+
+        // RENDER PUBLIC PROFILE CARD (COLLAPSING EMPTY FIELDS)
+        function renderProfile() {
+            // Identity Header
+            document.getElementById('out-name').innerText = profile.name || 'YOUR NAME';
+            
+            toggleFieldDisplay('out-handle', profile.handle);
+            toggleFieldDisplay('out-pronouns', profile.pronouns);
+            toggleFieldDisplay('out-motto', profile.motto);
+            toggleFieldDisplay('out-location', profile.location, (el, val) => el.querySelector('span').innerText = val);
+            toggleFieldDisplay('out-age', profile.age, (el, val) => el.innerText = `Age/Bday: ${val}`);
+            toggleFieldDisplay('out-contact', profile.contact, (el, val) => el.innerText = `Contact: ${val}`);
+
+            // Physical Block
+            const physicalItems = [
+                { label: 'Height', val: profile.height },
+                { label: 'Build / Frame', val: profile.build },
+                { label: 'Hair', val: profile.hair },
+                { label: 'Eye Color', val: profile.eyes },
+                { label: 'Dominant Hand', val: profile.hand },
+                { label: 'Eyesight', val: profile.eyesight },
+                { label: 'Tattoos / Piercings', val: profile.tattoos },
+                { label: 'Weather Sensitivities', val: profile.weather },
+                { label: 'Physical Quirks', val: profile.physicalQuirks }
+            ];
+            renderKeyValueSection('box-physical', 'out-physical-grid', physicalItems);
+
+            // Languages Block
+            const langBox = document.getElementById('box-languages');
+            const langContainer = document.getElementById('out-languages');
+            langContainer.innerHTML = '';
+            const validLangs = (profile.languages || []).filter(l => l.name);
+            if(validLangs.length > 0) {
+                langBox.classList.remove('hidden');
+                validLangs.forEach(l => {
+                    const div = document.createElement('div');
+                    div.className = 'flex justify-between items-center p-2 rounded card-frame';
+                    div.innerHTML = `<span class="font-medium">${l.name}</span>${l.level ? `<span class="text-[11px] font-mono tag-pill px-2 py-0.5 rounded">${l.level}</span>` : ''}`;
+                    langContainer.appendChild(div);
+                });
+            } else {
+                langBox.classList.add('hidden');
+            }
+
+            // Hobbies Block
+            const hobbyBox = document.getElementById('box-hobbies');
+            const hobbyContainer = document.getElementById('out-hobbies-container');
+            hobbyContainer.innerHTML = '';
+            const h = profile.hobbies || {};
+            const hobbyCategories = [
+                { label: 'Athletic & Physical', icon: 'fa-person-running', items: h.athletic },
+                { label: 'Creative & Expressive', icon: 'fa-palette', items: h.creative },
+                { label: 'Intellectual Fixations', icon: 'fa-book-open', items: h.intellectual },
+                { label: 'Social & Group', icon: 'fa-users', items: h.social },
+                { label: 'Gaming & Digital', icon: 'fa-gamepad', items: h.gaming },
+                { label: 'Outdoor & Nature', icon: 'fa-campground', items: h.outdoor },
+                { label: 'Crafts & Hands-On', icon: 'fa-wrench', items: h.crafts }
+            ].filter(c => c.items && c.items.length > 0);
+
+            if(hobbyCategories.length > 0) {
+                hobbyBox.classList.remove('hidden');
+                hobbyCategories.forEach(cat => {
+                    const div = document.createElement('div');
+                    div.className = 'space-y-1.5';
+                    const tagsHtml = cat.items.map(it => `<span class="inline-block tag-pill px-2 py-0.5 rounded text-[11px] font-medium mr-1 mb-1">${it}</span>`).join('');
+                    div.innerHTML = `
+                        <div class="font-medium text-slate-500 text-[11px] flex items-center gap-1.5">
+                            <i class="fa-solid ${cat.icon}"></i> ${cat.label}
+                        </div>
+                        <div>${tagsHtml}</div>
+                    `;
+                    hobbyContainer.appendChild(div);
+                });
+            } else {
+                hobbyBox.classList.add('hidden');
+            }
+
+            // Daily Rhythms Block
+            const rhythmItems = [
+                { label: 'Chronotype', val: profile.chronotype },
+                { label: 'Peak Focus Hours', val: profile.peakHours },
+                { label: 'Sleep Need', val: profile.sleepNeed },
+                { label: 'Caffeine Routine', val: profile.caffeine },
+                { label: 'Noise Sensitivity', val: profile.noisePref },
+                { label: 'Ideal Temp', val: profile.tempPref },
+                { label: 'Daily Energy Pattern', val: profile.energyPattern }
+            ];
+            renderKeyValueSection('box-rhythms', 'out-rhythms-grid', rhythmItems);
+
+            // Social & Comm Block
+            const socialItems = [
+                { label: 'Preferred Messaging', val: profile.messagingApps },
+                { label: 'Response Pace', val: profile.responsePace },
+                { label: 'Small Talk Stance', val: profile.smallTalkStance },
+                { label: 'Directness Level', val: profile.directness },
+                { label: 'Social Battery', val: profile.socialBattery },
+                { label: 'Group Size Pref', val: profile.groupPref },
+                { label: 'Voice / Video Calls', val: profile.callStance }
+            ];
+            renderKeyValueSection('box-social', 'out-social-grid', socialItems);
+
+            // Dietary & Sensory Block
+            const dietaryItems = [
+                { label: 'Dietary Pattern', val: profile.dietPattern },
+                { label: 'Spice Tolerance', val: profile.spiceTolerance },
+                { label: 'Favorite Flavors', val: profile.flavorProfiles },
+                { label: 'Sensory Notes', val: profile.sensoryNotes },
+                { label: 'Comfort Foods/Drinks', val: profile.comfortFoods }
+            ];
+            renderKeyValueSection('box-dietary', 'out-dietary-grid', dietaryItems);
+
+            // Work & Gear Block
+            const workgearItems = [
+                { label: 'Current Role', val: profile.workRole },
+                { label: 'Work Style', val: profile.workStyle },
+                { label: 'Primary OS / Tech', val: profile.primaryOS },
+                { label: 'Daily Carry (EDC)', val: profile.edcGear },
+                { label: 'Software / Tools', val: profile.softwareTools }
+            ];
+            renderKeyValueSection('box-workgear', 'out-workgear-grid', workgearItems);
+
+            // Values & Vibe Block
+            const valuesItems = [
+                { label: 'Top Life Values', val: profile.topValues },
+                { label: 'Topics of Interest', val: profile.favoriteTopics },
+                { label: 'Hyperfixation', val: profile.hyperfixation },
+                { label: 'Pet Peeves', val: profile.petPeeves },
+                { label: 'Aesthetics & Vibes', val: profile.aesthetics }
+            ];
+            renderKeyValueSection('box-values', 'out-values-grid', valuesItems);
+
+            // Custom Sections Block
+            const customContainer = document.getElementById('out-custom-sections');
+            customContainer.innerHTML = '';
+            if(profile.customSections && profile.customSections.length > 0) {
+                profile.customSections.forEach(sec => {
+                    const validItems = (sec.items || []).filter(it => it.label || it.val);
+                    if(sec.title && validItems.length > 0) {
+                        const secDiv = document.createElement('div');
+                        secDiv.className = 'card-frame rounded-lg p-4 space-y-3';
+                        
+                        const itemsHtml = validItems.map(it => `
+                            <div class="p-2.5 rounded card-frame">
+                                ${it.label ? `<span class="block text-[10px] font-mono text-slate-400 uppercase">${it.label}</span>` : ''}
+                                <span class="font-medium">${it.val || ''}</span>
+                            </div>
+                        `).join('');
+
+                        secDiv.innerHTML = `
+                            <div class="flex items-center gap-2 border-b border-theme pb-2 text-xs font-semibold tracking-wider text-slate-400 uppercase font-mono">
+                                <i class="fa-solid fa-list-check text-sm"></i>
+                                <span>${sec.title}</span>
+                            </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+                                ${itemsHtml}
+                            </div>
+                        `;
+                        customContainer.appendChild(secDiv);
+                    }
+                });
+            }
+
+            // Update Link URL
+            const slug = (profile.name || 'user').toLowerCase().replace(/\s+/g, '-');
+            document.getElementById('shareUrl').value = `${window.location.origin}${window.location.pathname}#${encodeURIComponent(slug)}`;
+        }
+
+        // Helper to show/hide individual header text fields
+        function toggleFieldDisplay(id, val, customSetter) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            if (val) {
+                el.classList.remove('hidden');
+                if (customSetter) customSetter(el, val);
+                else el.innerText = val;
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
+        // Helper to render standard key-value containers and collapse if empty
+        function renderKeyValueSection(boxId, gridId, itemsArray) {
+            const box = document.getElementById(boxId);
+            const grid = document.getElementById(gridId);
+            if (!box || !grid) return;
+            grid.innerHTML = '';
+
+            const validItems = (itemsArray || []).filter(i => i.val);
+            if (validItems.length > 0) {
+                box.classList.remove('hidden');
+                validItems.forEach(i => {
+                    const div = document.createElement('div');
+                    div.className = 'p-2.5 rounded card-frame';
+                    div.innerHTML = `
+                        <span class="block text-[10px] font-mono text-slate-400 uppercase">${i.label}</span>
+                        <span class="font-medium text-xs">${i.val}</span>
+                    `;
+                    grid.appendChild(div);
+                });
+            } else {
+                box.classList.add('hidden');
+            }
+        }
+
+        // Clear All Data
+        function clearAllFields() {
+            if(confirm('Are you sure you want to clear all fields?')) {
+                profile = createBlankProfile();
+                populateForms();
+                renderProfile();
+                saveState();
+            }
+        }
+
+        // Sample Data Quick Fill (For testing purposes)
+        function fillSampleData() {
+            profile = {
+                theme: 'slate',
+                name: 'Morgan Thorne',
+                handle: '@mthorne',
+                pronouns: 'They/Them',
+                location: 'Portland, OR (UTC-8)',
+                age: 'Late 20s',
+                contact: 'Signal / Matrix',
+                motto: 'Build deep, communicate directly, stay curious.',
+                
+                height: '5\'11" (180 cm)',
+                build: 'Athletic / Lean',
+                hair: 'Dark Brown, Undercut',
+                eyes: 'Hazel',
+                hand: 'Right-handed',
+                eyesight: 'Glasses for screen work',
+                tattoos: 'Botanical sleeve on left forearm',
+                weather: 'Loves rain & cool weather; hates extreme heat',
+                physicalQuirks: 'Fidgets with pen while thinking',
+
+                languages: [
+                    { name: 'English', level: 'Native' },
+                    { name: 'Japanese', level: 'Conversational (JLPT N3)' },
+                    { name: 'Spanish', level: 'Basic' }
+                ],
+
+                hobbies: {
+                    athletic: ['Bouldering (V5)', 'Trail Running', 'Cycling'],
+                    creative: ['Film Photography (35mm)', 'Synthesisers', 'Zine Printing'],
+                    intellectual: ['Urban Transit History', 'Cybernetics', 'Linguistics'],
+                    social: ['Board Game Nights', 'Co-op Cooking'],
+                    gaming: ['Factorio', 'Tactical RPGs', 'Retro Emulators'],
+                    outdoor: ['Backpacking', 'Mushroom Foraging'],
+                    crafts: ['Soldering PCBs', 'Mechanical Keyboards']
+                },
+
+                chronotype: 'Night Owl (01:00 - 08:30)',
+                peakHours: '20:00 - 00:00 (Evening Focus)',
+                sleepNeed: '8 Hours strictly',
+                caffeine: '1 Black coffee at 10 AM',
+                noisePref: 'Requires total quiet or brown noise',
+                tempPref: 'Cool 66°F (19°C)',
+                energyPattern: 'Slow morning startup, sustained evening peak',
+
+                messagingApps: 'Signal > Discord > Email',
+                responsePace: 'Batch responder (2x daily)',
+                smallTalkStance: 'Prefer jumping straight to core topics',
+                directness: 'High directness, gentle delivery',
+                socialBattery: 'Moderate (Recharges solo)',
+                groupPref: '1-on-1 or small groups of 3-4',
+                callStance: 'Async text preferred; calls require advance notice',
+
+                dietPattern: 'Vegetarian',
+                spiceTolerance: 'High (Habanero / Thai Hot)',
+                flavorProfiles: 'Umami, Sour, Fermented, Citrus',
+                sensoryNotes: 'Sensitive to fluorescent lighting & crowded rooms',
+                comfortFoods: 'Tonkotsu Veggie Ramen, Espresso, Sourdough',
+
+                workRole: 'Systems Architect & Embedded Dev',
+                workStyle: 'Deep work blocks, solo execution',
+                primaryOS: 'Arch Linux / Neovim',
+                edcGear: 'Ricoh GR III, Pocket Notebook, Titanium Pen',
+                softwareTools: 'Obsidian, Neovim, Figma, Git',
+
+                topValues: 'Autonomy, Mastery, Integrity, Continuous Learning',
+                favoriteTopics: 'Decentralized Tech, Sound Design, Architecture',
+                hyperfixation: 'Vintage High-Fi Audio Repair',
+                petPeeves: 'Unannounced video calls, Loud phone speakers in public',
+                aesthetics: 'Industrial Minimal, Matte Black, Warm Walnut Wood',
+
+                customSections: [
+                    {
+                        title: 'CURRENT READING LIST',
+                        items: [
+                            { label: 'Currently Reading', val: 'Design Systems by Alla Kholmatova' },
+                            { label: 'Favorite Fiction', val: 'Neuromancer by William Gibson' }
+                        ]
+                    }
+                ]
+            };
+
+            populateForms();
+            renderProfile();
+            saveState();
+        }
+
+        // Theme Manager
+        function changeTheme(themeName) {
+            profile.theme = themeName;
+            document.body.className = `theme-${themeName} font-sans antialiased min-h-screen p-3 sm:p-6 transition-colors duration-200`;
+            saveState();
+        }
+
+        // Form Tab Switcher
+        function switchTab(tab) {
+            document.querySelectorAll('.form-sec').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('[id^="tab-"]').forEach(el => {
+                el.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'text-slate-900');
+                el.classList.add('text-slate-500');
+            });
+
+            document.getElementById(`section-${tab}`).classList.remove('hidden');
+            const activeTab = document.getElementById(`tab-${tab}`);
+            activeTab.classList.add('bg-slate-100', 'dark:bg-slate-800', 'text-slate-900');
+            activeTab.classList.remove('text-slate-500');
+        }
+
+        // Toggle Edit Mode Panel
+        let editMode = true;
+        function toggleEditMode() {
+            editMode = !editMode;
+            const ed = document.getElementById('editorPanel');
+            const prev = document.getElementById('previewPanel');
+            const btnText = document.getElementById('editToggleText');
+
+            if(editMode) {
+                ed.classList.remove('hidden');
+                prev.classList.remove('lg:col-span-12');
+                prev.classList.add('lg:col-span-7');
+                btnText.innerText = 'Close Editor';
+            } else {
+                ed.classList.add('hidden');
+                prev.classList.remove('lg:col-span-7');
+                prev.classList.add('lg:col-span-12');
+                btnText.innerText = 'Edit Profile';
+            }
+        }
+
+        // Storage Management
+        function saveState() {
+            try {
+                localStorage.setItem('personal_stat_sheet_v2', JSON.stringify(profile));
+            } catch(e) {}
+        }
+
+        function loadState() {
+            try {
+                const saved = localStorage.getItem('personal_stat_sheet_v2');
+                if(saved) profile = Object.assign(createBlankProfile(), JSON.parse(saved));
+            } catch(e) {}
+        }
+
+        // Share & Modal Handlers
+        function openShareModal() {
+            document.getElementById('shareModal').classList.remove('hidden');
+        }
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.add('hidden');
+            document.getElementById('copyMsg').classList.add('hidden');
+        }
+        function copyLink() {
+            const el = document.getElementById('shareUrl');
+            el.select();
+            document.execCommand('copy');
+            document.getElementById('copyMsg').classList.remove('hidden');
+        }
+
+        function exportJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(profile, null, 2));
+            const a = document.createElement('a');
+            a.href = dataStr;
+            a.download = `stat_sheet_${(profile.name || 'user').toLowerCase().replace(/\s+/g, '_')}.json`;
+            a.click();
+        }
+
+        function importJSON(e) {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    profile = Object.assign(createBlankProfile(), JSON.parse(evt.target.result));
+                    populateForms();
+                    renderProfile();
+                    closeShareModal();
+                } catch(err) {
+                    alert('Invalid JSON File Format');
+                }
+            };
+            if(e.target.files[0]) reader.readAsText(e.target.files[0]);
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+    <script>
+    /* =====================================================================
+       SUPABASE BACKEND: accounts, saving, profile URLs, Discover.
+       Everything lives in this block. Edit index.html only.
+       ===================================================================== */
+    const SUPABASE_URL = 'https://YOUR-PROJECT.supabase.co';
+    const SUPABASE_ANON_KEY = 'YOUR-ANON-KEY';   // public by design; row-level security protects data
+
+    (function () {
+        'use strict';
+        if (SUPABASE_URL.includes('YOUR-PROJECT')) {
+            document.body.insertAdjacentHTML('afterbegin', '<div class="max-w-6xl mx-auto mb-3 text-xs rounded px-3 py-2 bg-amber-100 text-amber-900">Local-only mode: set SUPABASE_URL and SUPABASE_ANON_KEY near the bottom of index.html to enable accounts and Discover.</div>');
+            return;
+        }
+
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { flowType: 'pkce' } });
+        const RESERVED = ['discover', 'me', 'new', 'login', 'admin', 'api'];
+        const SLUG_RE = /^[a-z0-9][a-z0-9-]{2,29}$/;
+        const base = location.origin + location.pathname;
+        const $ = id => document.getElementById(id);
+        const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        // Other people's data is rendered via innerHTML by the original code: neutralise angle brackets.
+        const defang = v => typeof v === 'string' ? v.replace(/</g, '\uFF1C').replace(/>/g, '\uFF1E')
+            : Array.isArray(v) ? v.map(defang)
+            : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, defang(x)])) : v;
+
+        let user = null, mine = null, isOwner = false, curSlug = '', timer = null;
+
+        function extractInterests(p) {
+            const split = s => String(s || '').split(/[,;]/);
+            const raw = [].concat(...Object.values(p.hobbies || {}), split(p.favoriteTopics), split(p.hyperfixation));
+            return [...new Set(raw.map(s => String(s).toLowerCase().replace(/\(.*?\)/g, '').replace(/\s+/g, ' ').trim())
+                .filter(s => s.length > 1 && s.length < 40))].slice(0, 100);
+        }
+
+        function setStatus(msg, bad) {
+            const el = $('sbStatus');
+            el.textContent = msg;
+            el.className = 'font-mono text-[11px] ' + (bad ? 'text-red-600' : 'text-slate-400');
+        }
+
+        /* ---------- saving (autosave, owner only) ---------- */
+        async function persist() {
+            timer = null;
+            if (!isOwner || !mine) return;
+            const { error } = await sb.from('profiles').update({
+                data: profile, interests: extractInterests(profile),
+                discoverable: $('sbListed').checked, updated_at: new Date().toISOString()
+            }).eq('user_id', user.id);
+            if (!error) { mine.data = profile; mine.discoverable = $('sbListed').checked; }
+            setStatus(error ? 'Save failed: ' + error.message : 'Saved ✓', !!error);
+        }
+        function queueSave() {
+            if (!isOwner) return;
+            setStatus('Saving…');
+            clearTimeout(timer);
+            timer = setTimeout(persist, 1200);
+        }
+        window.saveState = queueSave;
+        window.loadState = function () {};
+        window.addEventListener('beforeunload', e => { if (timer) { e.preventDefault(); e.returnValue = ''; } });
+
+        const baseRender = window.renderProfile;
+        window.renderProfile = function () {
+            baseRender();
+            $('shareUrl').value = base + '#/' + curSlug;
+            document.title = profile.name ? profile.name + ' · Stat Sheet' : 'Personal Stat Sheet';
+        };
+
+        /* ---------- UI chrome ---------- */
+        function buildChrome() {
+            document.querySelector('header div.text-xs').insertAdjacentHTML('afterbegin', `
+                <span id="sbStatus" class="font-mono text-[11px] text-slate-400"></span>
+                <span id="sbListedWrap" class="hidden"><label class="flex items-center gap-1 cursor-pointer" title="Let others find you by shared interests"><input type="checkbox" id="sbListed" checked> Listed in Discover</label></span>
+                <a href="#/discover" class="px-2.5 py-1.5 rounded card-frame font-medium hover:bg-slate-100"><i class="fa-solid fa-compass mr-1"></i>Discover</a>
+                <a id="sbMine" href="#/" class="hidden px-2.5 py-1.5 rounded card-frame font-medium hover:bg-slate-100">My sheet</a>
+                <button id="sbAuth" class="px-2.5 py-1.5 rounded card-frame font-medium hover:bg-slate-100">Sign in</button>`);
+
+            $('previewPanel').parentElement.insertAdjacentHTML('afterend', `
+                <section id="sbDiscover" class="hidden max-w-6xl mx-auto space-y-4">
+                    <div class="card-frame rounded-lg p-4 space-y-3">
+                        <h2 class="font-semibold text-sm"><i class="fa-solid fa-compass mr-2 text-slate-400"></i>FIND SIMILAR PEOPLE</h2>
+                        <div class="flex gap-2 text-xs">
+                            <input id="sbQ" placeholder="bouldering, linguistics, synthesisers…" class="card-frame flex-1 rounded px-2.5 py-1.5 focus:outline-none">
+                            <button id="sbGo" class="px-3 py-1.5 bg-slate-900 text-white rounded font-medium">Search</button>
+                        </div>
+                        <p class="text-[11px] text-slate-400">Comma-separated interests. Signed in? Yours are pre-filled. Only people who opted in appear here.</p>
+                    </div>
+                    <div id="sbResults" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+                </section>`);
+
+            const modal = (id, inner) => `<div id="${id}" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden"><div class="card-frame max-w-md w-full rounded-xl p-5 space-y-3 shadow-xl text-xs">${inner}</div></div>`;
+            document.body.insertAdjacentHTML('beforeend',
+                modal('sbAuthModal', `
+                    <div class="flex justify-between items-center border-b border-theme pb-3"><h3 class="font-semibold text-sm">Sign in</h3><button id="sbAuthClose" class="text-slate-400 text-sm"><i class="fa-solid fa-xmark"></i></button></div>
+                    <button id="sbGithub" class="w-full px-3 py-2 bg-slate-900 text-white rounded font-medium"><i class="fa-brands fa-github mr-1"></i> Continue with GitHub</button>
+                    <input id="sbEmail" type="email" placeholder="you@example.com" class="card-frame w-full rounded px-2.5 py-1.5 focus:outline-none">
+                    <button id="sbMagic" class="w-full card-frame px-3 py-2 rounded font-medium hover:bg-slate-100">Email me a sign-in link</button>
+                    <p id="sbAuthMsg" class="text-slate-500"></p>`) +
+                modal('sbSlugModal', `
+                    <h3 class="font-semibold text-sm border-b border-theme pb-3">Pick your URL</h3>
+                    <p class="text-slate-500">Your sheet will live at <span class="font-mono">${esc(base)}#/<b>your-name</b></span>. This can't be changed later.</p>
+                    <input id="sbSlug" placeholder="your-name" class="card-frame w-full rounded px-2.5 py-1.5 font-mono focus:outline-none">
+                    <p id="sbSlugErr" class="text-red-600"></p>
+                    <button id="sbSlugGo" class="w-full px-3 py-2 bg-slate-900 text-white rounded font-medium">Create my sheet</button>`));
+
+            $('sbAuth').onclick = () => user ? sb.auth.signOut() : $('sbAuthModal').classList.remove('hidden');
+            $('sbAuthClose').onclick = () => $('sbAuthModal').classList.add('hidden');
+            $('sbGithub').onclick = () => sb.auth.signInWithOAuth({ provider: 'github', options: { redirectTo: base } });
+            $('sbMagic').onclick = async () => {
+                const { error } = await sb.auth.signInWithOtp({ email: $('sbEmail').value.trim(), options: { emailRedirectTo: base } });
+                $('sbAuthMsg').textContent = error ? error.message : 'Check your inbox, and open the link in this same browser.';
+            };
+            $('sbListed').onchange = queueSave;
+            $('sbGo').onclick = runDiscover;
+            $('sbQ').onkeydown = e => { if (e.key === 'Enter') runDiscover(); };
+            $('sbSlugGo').onclick = createProfile;
+        }
+
+        /* ---------- accounts & profile creation ---------- */
+        async function refreshUser() {
+            const { data } = await sb.auth.getSession();
+            user = data.session ? data.session.user : null;
+            mine = null;
+            if (user) {
+                const r = await sb.from('profiles').select('*').eq('user_id', user.id).maybeSingle();
+                mine = r.data;
+                if (mine) $('sbListed').checked = mine.discoverable;
+                else $('sbSlugModal').classList.remove('hidden');
+            }
+            $('sbAuth').textContent = user ? 'Sign out' : 'Sign in';
+            $('sbAuthModal').classList.add('hidden');
+            $('sbMine').classList.toggle('hidden', !mine);
+            $('sbListedWrap').classList.toggle('hidden', !mine);
+        }
+
+        async function createProfile() {
+            const s = $('sbSlug').value.trim().toLowerCase(), err = $('sbSlugErr');
+            if (!SLUG_RE.test(s) || RESERVED.includes(s)) { err.textContent = 'Use 3–30 characters: a–z, 0–9, hyphens.'; return; }
+            const { error } = await sb.from('profiles').insert({ user_id: user.id, slug: s, data: createBlankProfile(), interests: [], discoverable: true });
+            if (error) { err.textContent = error.code === '23505' ? 'That URL is taken.' : error.message; return; }
+            $('sbSlugModal').classList.add('hidden');
+            await refreshUser();
+            if (location.hash === '#/' + s) show(); else location.hash = '#/' + s;
+        }
+
+        /* ---------- routing: #/slug, #/discover, #/ ---------- */
+        function setMode(owner) {
+            isOwner = owner;
+            ['clearAllFields()', 'fillSampleData()', 'toggleEditMode()'].forEach(fn => {
+                const b = document.querySelector(`button[onclick="${fn}"]`);
+                if (b) b.classList.toggle('hidden', !owner);
+            });
+            if (editMode !== owner) toggleEditMode();
+        }
+
+        function load(d) {
+            profile = Object.assign(createBlankProfile(), d);
+            populateForms();
+            const t = profile.theme || 'slate';
+            document.body.className = `theme-${t} font-sans antialiased min-h-screen p-3 sm:p-6 transition-colors duration-200`;
+            $('themeSelect').value = t;
+            renderProfile();
+        }
+
+        async function show() {
+            const r = decodeURIComponent(location.hash.replace(/^#\/?/, '')).toLowerCase();
+            const disc = r === 'discover';
+            $('previewPanel').parentElement.classList.toggle('hidden', disc);
+            $('sbDiscover').classList.toggle('hidden', !disc);
+            if (disc) {
+                if (!$('sbQ').value && mine) $('sbQ').value = extractInterests(mine.data).join(', ');
+                return runDiscover();
+            }
+            if (!r && mine) { location.replace('#/' + mine.slug); return; }
+            curSlug = r || (mine ? mine.slug : '');
+            if (!r) { setMode(false); load({ name: 'Welcome', motto: 'Sign in to create your stat sheet, or try Discover.' }); return; }
+            if (mine && r === mine.slug) { setMode(true); load(mine.data); setStatus(''); return; }
+            setMode(false);
+            const { data } = await sb.rpc('get_profile', { p_slug: r });
+            load(data ? defang(data.data) : { name: 'Profile not found', motto: 'Nothing lives at “' + r.replace(/[<>]/g, '') + '”.' });
+        }
+
+        /* ---------- discover ---------- */
+        async function runDiscover() {
+            const q = $('sbQ').value.split(',').map(s => s.toLowerCase().replace(/\s+/g, ' ').trim()).filter(Boolean);
+            const { data, error } = await sb.rpc('find_similar', { p_interests: q, p_limit: 30 });
+            $('sbResults').innerHTML = error ? `<p class="text-xs text-red-600">${esc(error.message)}</p>`
+                : (data || []).length ? data.map(r => `
+                    <a href="#/${esc(r.slug)}" class="card-frame rounded-lg p-3 block hover:shadow-sm space-y-2 text-xs">
+                        <div class="font-semibold text-sm">${esc(r.name || r.slug)}</div>
+                        <div class="text-slate-500">${esc(r.motto || '')}</div>
+                        <div class="flex flex-wrap gap-1">${(r.shared || []).map(t => `<span class="tag-pill px-2 py-0.5 rounded font-mono text-[11px]">${esc(t)}</span>`).join('')}</div>
+                        <div class="font-mono text-[11px] text-slate-400">/${esc(r.slug)} · ${r.score} shared</div>
+                    </a>`).join('')
+                : '<p class="text-xs text-slate-500">No matches yet. Try broader interests.</p>';
+        }
+
+        /* ---------- boot ---------- */
+        window.onload = async function () {
+            buildChrome();
+            await refreshUser();
+            if (location.search) history.replaceState(null, '', base + location.hash);   // drop ?code= after login
+            await show();
+            window.addEventListener('hashchange', show);
+            sb.auth.onAuthStateChange((ev, s) => {
+                const id = s && s.user ? s.user.id : null;
+                if (id !== (user ? user.id : null)) setTimeout(async () => { await refreshUser(); await show(); }, 0);
+            });
+        };
+    })();
+    </script>
+</body>
+</html>
