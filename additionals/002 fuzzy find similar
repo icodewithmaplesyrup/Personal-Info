@@ -1,0 +1,43 @@
+-- Fuzzy interest matching for Discover. Run once in Supabase: SQL Editor -> New query -> Run.
+-- 'group 5 "super silhouette"' matches 'super silhouette' or 'group 5'; 'photography' matches 'film photography'.
+-- Tune the two 0.6 thresholds: lower = looser matches, higher = stricter.
+
+create extension if not exists pg_trgm with schema extensions;
+
+create or replace function public.find_similar(p_interests text[], p_limit int default 30)
+returns table (slug text, name text, motto text, shared text[], score int)
+language sql stable security definer set search_path = public, extensions as $$
+  with q as (
+    select distinct lower(btrim(t)) as term
+    from unnest(coalesce(p_interests, '{}')) as t
+    where btrim(t) <> ''
+  ),
+  hits as (
+    select p.user_id, p.slug, p.data, p.updated_at, u.interest, q.term
+    from public.profiles p
+    cross join lateral unnest(p.interests) as u(interest)
+    join q on word_similarity(q.term, u.interest) >= 0.6
+           or word_similarity(u.interest, q.term) >= 0.6
+    where p.discoverable and p.user_id is distinct from auth.uid()
+  ),
+  agg as (
+    select user_id, slug, data, updated_at,
+           array_agg(distinct interest) as shared,
+           count(distinct term)::int as score
+    from hits
+    group by user_id, slug, data, updated_at
+  )
+  select r.slug, r.name, r.motto, r.shared, r.score from (
+    select a.slug, a.data->>'name' as name, a.data->>'motto' as motto, a.shared, a.score, a.updated_at
+    from agg a
+    union all
+    select p.slug, p.data->>'name', p.data->>'motto', '{}'::text[], 0, p.updated_at
+    from public.profiles p
+    where not exists (select 1 from q)
+      and p.discoverable and p.user_id is distinct from auth.uid()
+  ) r
+  order by r.score desc, r.updated_at desc
+  limit least(coalesce(p_limit, 30), 50)
+$$;
+
+grant execute on function public.find_similar(text[], int) to anon, authenticated;
